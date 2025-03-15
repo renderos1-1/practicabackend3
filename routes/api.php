@@ -3,6 +3,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\V1\PostController;
+use App\Http\Controllers\Api\V1\AuthController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,9 +22,13 @@ Route::middleware('auth:web')->get('/user', function (Request $request) {
 
 // API V1 Routes
 Route::prefix('v1')->group(function () {
-    // Rutas protegidas por autenticacion con cookies
+    // Authentication routes
+    Route::post('/auth/login', [AuthController::class, 'login']);
     Route::middleware('auth:web')->group(function () {
-        // Posts end
+        Route::post('/auth/logout', [AuthController::class, 'logout']);
+        Route::get('/auth/me', [AuthController::class, 'me']);
+
+        // Posts endpoints
         Route::apiResource('posts', PostController::class);
     });
 });
