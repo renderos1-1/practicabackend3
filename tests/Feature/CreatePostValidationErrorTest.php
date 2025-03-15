@@ -1,6 +1,6 @@
 <?php
 use App\Models\User;
-use function Pest\Laravel\test;
+use Pest\Laravel\test;
 
 test('Error de validación al crear post por falta de datos requeridos', function () {
 
