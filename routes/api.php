@@ -15,14 +15,14 @@ use App\Http\Controllers\Api\V1\PostController;
 |
 */
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
+Route::middleware('auth:web')->get('/user', function (Request $request) {
     return $request->user();
 });
 
 // API V1 Routes
 Route::prefix('v1')->group(function () {
-    // Rutas protegidas por autenticacion
-    Route::middleware('auth:sanctum')->group(function () {
+    // Rutas protegidas por autenticacion con cookies
+    Route::middleware('auth:web')->group(function () {
         // Posts end
         Route::apiResource('posts', PostController::class);
     });
