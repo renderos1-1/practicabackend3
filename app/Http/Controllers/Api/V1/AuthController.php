@@ -20,7 +20,8 @@ class AuthController extends Controller
         ]);
 
         if (Auth::attempt($request->only('email', 'password'))) {
-            $request->session()->regenerate();
+            //No regenerarate session token
+            //$request->session()->regenerate();
 
             return response()->json([
                 'message' => 'Logged in successfully',
@@ -54,8 +55,8 @@ class AuthController extends Controller
     {
         Auth::logout();
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        //$request->session()->invalidate();
+        //$request->session()->regenerateToken();
 
         return response()->json(['message' => 'Logged out successfully']);
     }

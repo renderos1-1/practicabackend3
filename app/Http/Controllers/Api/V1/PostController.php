@@ -12,7 +12,6 @@ use Illuminate\Support\Facades\Auth;
 class PostController extends Controller
 {
     /**
-     * Display a listing of posts.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
@@ -33,7 +32,6 @@ class PostController extends Controller
 
         $posts = $query->latest()->get();
 
-        // Transform posts to match test expectations
         $transformedPosts = $posts->map(function ($post) {
             return [
                 'id' => $post->id,
@@ -50,7 +48,6 @@ class PostController extends Controller
     }
 
     /**
-     * Store a newly created post.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
@@ -65,17 +62,15 @@ class PostController extends Controller
             'categories.*' => 'exists:categories,id',
         ]);
 
-        // Generate a slug
         $baseSlug = Str::slug($validated['title']);
         $slug = $baseSlug;
 
-        // Verify if slug exists, if so, make it unique by adding a number
         $count = 1;
         while (Post::where('slug', $slug)->exists()) {
             $slug = $baseSlug . '-' . $count++;
         }
 
-        // Create the post
+        // Crear post
         $post = Post::create([
             'title' => $validated['title'],
             'slug' => $slug,
@@ -84,13 +79,13 @@ class PostController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        // Attach categories
+        // Vincular categorias
         $post->categories()->attach($validated['categories']);
 
-        // Load relationships for response
+        // cargar categorias
         $post->load(['categories', 'user']);
 
-        // Format the response to match test expectations
+        // formato de respuesta
         $response = [
             'id' => $post->id,
             'title' => $post->title,
@@ -116,14 +111,14 @@ class PostController extends Controller
     }
 
     /**
-     * Display the specified post.
+     * mostrar post especifico
      *
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\JsonResponse
      */
     public function show(Post $post)
     {
-        // Check if the post belongs to the authenticated user
+
         if ($post->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -134,7 +129,7 @@ class PostController extends Controller
     }
 
     /**
-     * Update the specified post.
+     * Update
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Post  $post
@@ -142,7 +137,6 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post)
     {
-        // Check if the post belongs to the authenticated user
         if ($post->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -167,10 +161,8 @@ class PostController extends Controller
             $validated['slug'] = $slug;
         }
 
-        // Update the post
         $post->update($validated);
 
-        // Update categories
         if (isset($validated['categories'])) {
             $post->categories()->sync($validated['categories']);
         }
@@ -182,7 +174,7 @@ class PostController extends Controller
     }
 
     /**
-     * Remove the specified post.
+     * Remove
      *
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\JsonResponse

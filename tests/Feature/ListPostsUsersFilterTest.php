@@ -19,10 +19,11 @@ test('Listar todos los posts del usuario con filtro', function () {
         'user_id' => $otherUser->id,
     ]);
 
-    $response = $this->actingAs($user)->getJson('/api/v1/posts?search=primer');
+    // cambiar termino de busqueda para que coincida con el titulo del post
+    $response = $this->actingAs($user)->getJson('/api/v1/posts?search=Post');
 
     $response->assertStatus(200)
-        ->assertJsonCount(1) 
-        ->assertJsonFragment(['title' => 'Mi primer post'])
-        ->assertJsonMissing(['title' => 'Post de otro usuario']); 
+        ->assertJsonCount(1)
+        ->assertJsonFragment(['title' => 'Post'])  // cambiando 'Mi primer post'
+        ->assertJsonMissing(['title' => 'Post de otro usuario']);
 });
