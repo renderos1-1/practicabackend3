@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 class PostController extends Controller
 {
     /**
-     * mostrar lista de posts.
+     * Display a listing of posts.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
@@ -22,7 +22,7 @@ class PostController extends Controller
         $query = Post::where('user_id', Auth::id())
             ->with(['categories', 'user']);
 
-        // Aplicar filtro de busqueda
+        // Apply search filter
         if ($request->has('search') && !empty($request->search)) {
             $searchTerm = $request->search;
             $query->where(function ($q) use ($searchTerm) {
@@ -33,7 +33,7 @@ class PostController extends Controller
 
         $posts = $query->latest()->get();
 
-        // Modificaciones para matchear la respuesta esperada en el JSON
+        // Transform posts to match test expectations
         $transformedPosts = $posts->map(function ($post) {
             return [
                 'id' => $post->id,
@@ -46,11 +46,11 @@ class PostController extends Controller
             ];
         });
 
-        return response()->json($transformedPosts);
+        return response()->json(['data' => $transformedPosts]);
     }
 
     /**
-     * almacenar un nuevo post.
+     * Store a newly created post.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
@@ -65,11 +65,11 @@ class PostController extends Controller
             'categories.*' => 'exists:categories,id',
         ]);
 
-        // Generar un slug
+        // Generate a slug
         $baseSlug = Str::slug($validated['title']);
         $slug = $baseSlug;
 
-        //Verificar si existe el slug, si es asi, hacerlo unico agregando un numero
+        // Verify if slug exists, if so, make it unique by adding a number
         $count = 1;
         while (Post::where('slug', $slug)->exists()) {
             $slug = $baseSlug . '-' . $count++;
@@ -84,13 +84,13 @@ class PostController extends Controller
             'user_id' => Auth::id(),
         ]);
 
-        // vincular las categorias
+        // Attach categories
         $post->categories()->attach($validated['categories']);
 
-        // cargar las relaciones para la respuesta
+        // Load relationships for response
         $post->load(['categories', 'user']);
 
-        // Modificaciones para matchear la respuesta esperada en el JSON
+        // Format the response to match test expectations
         $response = [
             'id' => $post->id,
             'title' => $post->title,
@@ -116,14 +116,14 @@ class PostController extends Controller
     }
 
     /**
-     * post especifico.
+     * Display the specified post.
      *
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\JsonResponse
      */
     public function show(Post $post)
     {
-        // verificar si el post pertenece al usuario autenticado
+        // Check if the post belongs to the authenticated user
         if ($post->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -134,7 +134,7 @@ class PostController extends Controller
     }
 
     /**
-     * Uactualizar post especifico.
+     * Update the specified post.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \App\Models\Post  $post
@@ -159,7 +159,6 @@ class PostController extends Controller
             $baseSlug = Str::slug($validated['title']);
             $slug = $baseSlug;
 
-
             $count = 1;
             while (Post::where('slug', $slug)->where('id', '!=', $post->id)->exists()) {
                 $slug = $baseSlug . '-' . $count++;
@@ -168,21 +167,22 @@ class PostController extends Controller
             $validated['slug'] = $slug;
         }
 
-        // actualizar el post
+        // Update the post
         $post->update($validated);
 
-        // actualizar las categorias
+        // Update categories
         if (isset($validated['categories'])) {
             $post->categories()->sync($validated['categories']);
         }
 
-        // cargar las relaciones
+        // Load relationships
         $post->load(['categories', 'user']);
 
         return response()->json($post);
     }
 
     /**
+     * Remove the specified post.
      *
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\JsonResponse
