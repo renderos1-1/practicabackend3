@@ -5,7 +5,7 @@ use App\Models\Post;
 use Pest\Laravel\test;
 
 test('Crear post exitosamente aunque el slug este repetido.', function () {
-
+    $this->assertNotNull(DB::connection());
     $user = User::factory()->create();
     $categories = Category::factory()->count(2)->create();
     

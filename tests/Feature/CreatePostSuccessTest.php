@@ -5,6 +5,7 @@ use App\Models\Category;
 use Pest\Laravel\test;
 
 test('crear post exitosamente', function () {
+    $this->assertNotNull(DB::connection());
     $user = User::factory()->create();
     $categories= Category::factory()->count(2)->create();
 
