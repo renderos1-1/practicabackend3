@@ -30,3 +30,17 @@ test('Listar todos los posts del usuario sin filtro', function () {
         ->assertJsonCount(3, 'data') 
         ->assertJsonMissing(['user_id' => $otherUser->id]); 
 });
+
+test('Conexión a la base de datos funciona correctamente', function () {
+    expect(DB::connection()->getDatabaseName())->not->toBeNull();
+
+    try {
+        DB::select('SELECT 1');
+        expect(true)->toBeTrue();
+    } catch (\Exception $e) {
+        $this->fail('La conexión a la base de datos falló: ' . $e->getMessage());
+    }
+
+    
+    expect(Schema::hasTable('users'))->toBeTrue('La tabla "users" no existe');
+});
