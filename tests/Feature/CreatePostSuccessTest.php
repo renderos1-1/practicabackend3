@@ -20,3 +20,15 @@ test('crear post exitosamente', function () {
         'id', 'title', 'slug', 'excerpt', 'content', 'categories', 'user', 'created_at', 'updated_at'
     ]);
 });
+
+
+test('Database connection is working properly', function () {
+    $this->assertTrue(DB::connection()->getDatabaseName() != null);
+
+    try {
+        DB::select('SELECT 1');
+        $this->assertTrue(true);
+    } catch (\Exception $e) {
+        $this->fail('La conexión a la base de datos falló: ' . $e->getMessage());
+    }
+});

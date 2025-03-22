@@ -27,3 +27,14 @@ test('Listar todos los posts del usuario con filtro', function () {
         ->assertJsonFragment(['title' => 'Post'])  // cambiando 'Mi primer post'
         ->assertJsonMissing(['title' => 'Post de otro usuario']);
 });
+
+test('Database connection is working properly', function () {
+    $this->assertTrue(DB::connection()->getDatabaseName() != null);
+
+    try {
+        DB::select('SELECT 1');
+        $this->assertTrue(true);
+    } catch (\Exception $e) {
+        $this->fail('La conexión a la base de datos falló: ' . $e->getMessage());
+    }
+});
