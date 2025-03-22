@@ -41,3 +41,16 @@ test('Allow successfully Logout', function () {
     $response->assertStatus(200);
     $this->assertGuest();
 });
+
+test('Database connection is working properly', function () {
+    $this->assertTrue(DB::connection()->getDatabaseName() != null);
+
+    try {
+        DB::select('SELECT 1');
+        $this->assertTrue(true);
+    } catch (\Exception $e) {
+        $this->fail('La conexión a la base de datos falló: ' . $e->getMessage());
+    }
+
+    $this->assertTrue(Schema::hasTable('users'), 'La tabla "users" no existe');
+});
